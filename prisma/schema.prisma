@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  address   String
+  students  Student[]
+  createdAt DateTime  @default(now())
+}
+
+model Student {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  gender       String
+  dob          DateTime
+  schoolId     String        @db.ObjectId
+  school       School        @relation(fields: [schoolId], references: [id])
+  examinations Examination[]
+  createdAt    DateTime      @default(now())
+}
+
+model ExaminationSession {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  year         Int
+  sessionName  String // e.g. "Winter 2025", "Monsoon 2025"
+  startDate    DateTime
+  endDate      DateTime
+  examinations Examination[]
+  createdAt    DateTime      @default(now())
+}
+
+model Examination {
+  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String             @db.ObjectId
+  sessionId String             @db.ObjectId
+  date      DateTime
+  student   Student            @relation(fields: [studentId], references: [id])
+  session   ExaminationSession @relation(fields: [sessionId], references: [id])
+  diagnoses Diagnosis[]
+}
+
+model DiagnosisCategory {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String    @unique // e.g. "Eye", "Oral", "Skin", etc.
+  diseases Disease[]
+}
+
+model Disease {
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  diagnosisCategoryId String            @db.ObjectId
+  diagnosisCategory   DiagnosisCategory @relation(fields: [diagnosisCategoryId], references: [id])
+  diagnoses           Diagnosis[]
+}
+
+model Diagnosis {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  examinationId String  @db.ObjectId
+  diseaseId     String  @db.ObjectId
+  severity      String? // Optional: mild, moderate, severe
+  notes         String? // Optional: free text
+
+  examination Examination @relation(fields: [examinationId], references: [id])
+  disease     Disease     @relation(fields: [diseaseId], references: [id])
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  email String @unique
+  password String
+  role String // e.g. "admin", "doctor", "nurse"
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  DOCTOR
+  NURSE
+}
