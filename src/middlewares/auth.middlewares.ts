@@ -1,57 +1,52 @@
-// import jwt from "jsonwebtoken";
-// import dotenv from "dotenv";
-// import { PrismaClient, User } from "@/generated/prisma";
-// import { Request, Response, NextFunction } from "express";
-// import { UnauthenticatedError } from "@/errors/unauthenticated.errors";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import { Request, Response, NextFunction } from "express";
+import { UnauthenticatedError } from "@/errors/unauthenticated.errors";
+import { JWT_SECRET } from "@/libs";
+import { prisma } from "@/libs";
+import { User } from "@prisma/client";
 
-// dotenv.config();
-// const JWT_SECRET = process.env.JWT_SECRET;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
 
-// if (!JWT_SECRET) {
-//   throw new Error("JWT_SECRET is not defined in environment variables!");
-// }
+interface JwtPayload {
+  userId: string;
+}
 
-// const prisma = new PrismaClient();
+export const protectRoute = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token =
+    req.cookies?.token ||
+    req.headers.authorization?.replace("Bearer ", "") ||
+    req.headers["x-access-token"];
 
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       user?: User;
-//     }
-//   }
-// }
+  if (!token) {
+    throw new UnauthenticatedError("Token not provided!");
+  }
 
-// interface JwtPayload {
-//   userID: string;
-// }
+  const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+  if (!decoded || !decoded.userId) {
+    throw new UnauthenticatedError("Token not valid!");
+  }
 
-// export const protectRoute = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const token = req.cookies.jwt;
+  const user = await prisma.user.findUnique({
+    where: {
+      id: decoded.userId,
+    },
+  });
 
-//   if (!token) {
-//     throw new UnauthenticatedError("Token not provided!");
-//   }
+  if (!user) {
+    throw new UnauthenticatedError("Unauthorized user not found");
+  }
 
-//   const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-//   if (!decoded) {
-//     throw new UnauthenticatedError("Token not valid!");
-//   }
-
-//   // Find user
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       id: decoded.userID,
-//     },
-//   });
-
-//   if (!user) {
-//     return res.status(400).json({ message: "Unauthorized user not found" });
-//   }
-
-//   req.user = user;
-//   next();
-// };
+  req.user = user;
+  next();
+};
