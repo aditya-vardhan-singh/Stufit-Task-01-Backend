@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDashboard } from "@/controllers";
+import { getDashboard, getDashboardData } from "@/controllers";
 
 export const dashboardRoutes = Router();
 
@@ -29,3 +29,4 @@ export const dashboardRoutes = Router();
  */
 dashboardRoutes.get("/", getDashboard);
 
+dashboardRoutes.get("/data", getDashboardData);
