@@ -11,6 +11,7 @@ import { swaggerSpec } from "./swagger";
 const app = express();
 
 // Middlewares
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
