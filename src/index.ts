@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: [FRONTEND_URL, "https://stufit-task-01-frontend.vercel.app/"],
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
@@ -34,4 +34,6 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🚀 Dashboard API server running at port number: ${PORT}`);
+  console.log(`🌐 Swagger UI available at: http://localhost:${PORT}/api-docs`);
+  console.log(`🔗 Frontend URL: ${FRONTEND_URL}`);
 });
