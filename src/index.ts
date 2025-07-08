@@ -16,14 +16,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [FRONTEND_URL],
+    origin: FRONTEND_URL,
     credentials: true,
+    methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
   })
 );
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/dashboard", protectRoute, dashboardRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(notFound);
