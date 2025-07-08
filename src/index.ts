@@ -23,7 +23,7 @@ app.use(
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/dashboard", protectRoute, dashboardRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(notFound);
