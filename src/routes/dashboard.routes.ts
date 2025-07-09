@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getDashboard, getDashboardData } from "@/controllers";
+import { getDashboardData, getFilteredDashboardData } from "@/controllers";
 
 export const dashboardRoutes = Router();
 
@@ -10,23 +10,6 @@ export const dashboardRoutes = Router();
  *   description: User dashboard
  */
 
-/**
- * @swagger
- * /dashboard:
- *   get:
- *     summary: Get user dashboard
- *     tags: [Dashboard]
- *     responses:
- *       200:
- *         description: Dashboard data
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- */
-dashboardRoutes.get("/", getDashboard);
-
 dashboardRoutes.get("/data", getDashboardData);
+
+dashboardRoutes.get("/filterData", getFilteredDashboardData);
