@@ -14,9 +14,6 @@ export const getDashboardData = async (req: Request, res: Response) => {
       diseases: {
         select: {
           name: true,
-          // _count: {
-          //   // select: { diagnoses: true },
-          // },
           _count: true,
         },
       },

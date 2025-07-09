@@ -23,14 +23,14 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const token = generateToken(user.id);
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    path: "/",
-  });
-  res.status(StatusCodes.OK).json({ message: "Login successful" });
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: "lax",
+  //   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  //   path: "/",
+  // });
+  res.status(StatusCodes.OK).json({ message: "Login successful", token });
 };
 
 export const requestPasswordReset = async (req: Request, res: Response) => {
